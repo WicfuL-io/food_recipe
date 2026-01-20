@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:io';  // Tambahkan ini untuk File
 import '../models/recipe.dart';
 import '../services/api.dart';
 
@@ -61,10 +62,10 @@ class _EditRecipePageState extends State<EditRecipePage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          TextField(controller: title),
-          TextField(controller: desc),
-          TextField(controller: ing),
-          TextField(controller: steps),
+          TextField(controller: title, decoration: const InputDecoration(labelText: "Judul")),
+          TextField(controller: desc, decoration: const InputDecoration(labelText: "Deskripsi")),
+          TextField(controller: ing, decoration: const InputDecoration(labelText: "Bahan")),
+          TextField(controller: steps, decoration: const InputDecoration(labelText: "Langkah")),
           const SizedBox(height: 10),
 
           ElevatedButton.icon(
@@ -76,10 +77,11 @@ class _EditRecipePageState extends State<EditRecipePage> {
           const SizedBox(height: 10),
 
           image != null
-              ? Image.network(image!.path, height: 160)
-              : Image.network(
+              ? Image.file(File(image!.path), height: 160)  // Perbaiki: Preview gambar baru
+              : Image.network(  // Tampilkan gambar lama jika tidak ada gambar baru
                   "http://localhost/food_recipe_api/upload/${widget.recipe.image}",
                   height: 160,
+                  errorBuilder: (c, e, s) => const Icon(Icons.image_not_supported),
                 ),
 
           const SizedBox(height: 20),

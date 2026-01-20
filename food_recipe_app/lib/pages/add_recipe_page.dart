@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:io';  // Tambahkan ini untuk File
 import '../services/api.dart';
 
 class AddRecipePage extends StatefulWidget {
@@ -66,7 +67,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
           if (image != null)
             Padding(
               padding: const EdgeInsets.only(top: 10),
-              child: Image.network(image!.path, height: 160),
+              child: Image.file(File(image!.path), height: 160),  // Perbaiki: Gunakan Image.file untuk preview lokal
             ),
 
           const SizedBox(height: 20),

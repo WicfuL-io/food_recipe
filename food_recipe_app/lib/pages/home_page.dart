@@ -34,18 +34,20 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(builder: (_) => const AddRecipePage()),
           );
-          setState(loadData);
+          setState(() => loadData());  // Perbaiki: Panggil loadData di dalam setState
         },
         child: const Icon(Icons.add),
       ),
       body: FutureBuilder<List<Recipe>>(
         future: recipes,
         builder: (c, s) {
-          if (!s.hasData) {
+          if (s.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-
-          if (s.data!.isEmpty) {
+          if (s.hasError) {
+            return Center(child: Text("Error: ${s.error}"));
+          }
+          if (!s.hasData || s.data!.isEmpty) {
             return const Center(child: Text("Belum ada resep"));
           }
 
@@ -60,6 +62,7 @@ class _HomePageState extends State<HomePage> {
                     "http://localhost/food_recipe_api/upload/${r.image}",
                     width: 60,
                     fit: BoxFit.cover,
+                    errorBuilder: (c, e, s) => const Icon(Icons.image_not_supported),
                   ),
                   title: Text(r.title),
                   subtitle: Text(r.description),
@@ -75,14 +78,14 @@ class _HomePageState extends State<HomePage> {
                               builder: (_) => EditRecipePage(recipe: r),
                             ),
                           );
-                          setState(loadData);
+                          setState(() => loadData());  // Perbaiki: Panggil loadData di dalam setState
                         },
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () async {
                           await ApiService.deleteRecipe(r.id);
-                          setState(loadData);
+                          setState(() => loadData());  // Perbaiki: Panggil loadData di dalam setState
                         },
                       ),
                     ],

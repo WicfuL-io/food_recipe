@@ -8,17 +8,14 @@ $ingredients = $_POST['ingredients'];
 $steps = $_POST['steps'];
 
 if (!empty($_FILES['image']['name'])) {
-    $imageName = time() . "_" . $_FILES['image']['name'];
-    move_uploaded_file($_FILES['image']['tmp_name'], "../upload/".$imageName);
-    $conn->query("UPDATE recipes SET image='$imageName' WHERE id=$id");
+  $image = $_FILES['image']['name'];
+  move_uploaded_file($_FILES['image']['tmp_name'], "../upload/$image");
+  $conn->query("UPDATE recipes SET image='$image' WHERE id=$id");
 }
 
-$sql = "UPDATE recipes SET
+$conn->query("UPDATE recipes SET
 title='$title',
 description='$description',
 ingredients='$ingredients',
 steps='$steps'
-WHERE id=$id";
-
-$conn->query($sql);
-echo json_encode(["status" => true]);
+WHERE id=$id");

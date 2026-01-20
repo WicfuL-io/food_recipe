@@ -1,89 +1,58 @@
 import 'dart:convert';
+import 'dart:io';  // Untuk File
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
+import 'package:image_picker/image_picker.dart';  // Pastikan diimpor
 import '../models/recipe.dart';
 
 class ApiService {
-  static const baseUrl = "http://localhost/food_recipe_api";
+  static const String baseUrl = 'http://localhost/food_recipe_api';  // Ganti ke 'http://10.0.2.2' jika emulator Android
 
-  // READ
   static Future<List<Recipe>> getRecipes() async {
-    final res = await http.get(Uri.parse("$baseUrl/recipes/read.php"));
-    final data = jsonDecode(res.body);
-    return (data as List).map((e) => Recipe.fromJson(e)).toList();
-  }
-
-  // CREATE (WEB SAFE)
-  static Future<void> addRecipe(
-    String title,
-    String desc,
-    String ing,
-    String steps,
-    XFile image,
-  ) async {
-    var req = http.MultipartRequest(
-      "POST",
-      Uri.parse("$baseUrl/recipes/create.php"),
-    );
-
-    req.fields.addAll({
-      "title": title,
-      "description": desc,
-      "ingredients": ing,
-      "steps": steps,
-    });
-
-    req.files.add(
-      http.MultipartFile.fromBytes(
-        "image",
-        await image.readAsBytes(),
-        filename: image.name,
-      ),
-    );
-
-    await req.send();
-  }
-
-  // UPDATE
-  static Future<void> updateRecipe(
-    String id,
-    String title,
-    String desc,
-    String ing,
-    String steps,
-    XFile? image,
-  ) async {
-    var req = http.MultipartRequest(
-      "POST",
-      Uri.parse("$baseUrl/recipes/update.php"),
-    );
-
-    req.fields.addAll({
-      "id": id,
-      "title": title,
-      "description": desc,
-      "ingredients": ing,
-      "steps": steps,
-    });
-
-    if (image != null) {
-      req.files.add(
-        http.MultipartFile.fromBytes(
-          "image",
-          await image.readAsBytes(),
-          filename: image.name,
-        ),
-      );
+    final response = await http.get(Uri.parse('$baseUrl/recipes/read.php'));
+    if (response.statusCode == 200) {
+      List data = json.decode(response.body);
+      return data.map((e) => Recipe.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to load recipes');
     }
-
-    await req.send();
   }
 
-  // DELETE
+  static Future<void> addRecipe(String title, String desc, String ing, String steps, XFile image) async {
+    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/recipes/create.php'));
+    request.fields['title'] = title;
+    request.fields['description'] = desc;
+    request.fields['ingredients'] = ing;
+    request.fields['steps'] = steps;
+    request.files.add(await http.MultipartFile.fromPath('image', image.path));
+    var response = await request.send();
+    if (response.statusCode != 200) {
+      throw Exception('Failed to add recipe');
+    }
+  }
+
+  static Future<void> updateRecipe(String id, String title, String desc, String ing, String steps, XFile? image) async {
+    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/recipes/update.php'));
+    request.fields['id'] = id;
+    request.fields['title'] = title;
+    request.fields['description'] = desc;
+    request.fields['ingredients'] = ing;
+    request.fields['steps'] = steps;
+    if (image != null) {
+      request.files.add(await http.MultipartFile.fromPath('image', image.path));
+    }
+    var response = await request.send();
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update recipe');
+    }
+  }
+
   static Future<void> deleteRecipe(String id) async {
-    await http.post(
-      Uri.parse("$baseUrl/recipes/delete.php"),
-      body: {"id": id},
+    final response = await http.post(
+      Uri.parse('$baseUrl/recipes/delete.php'),
+      body: {'id': id},
     );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete recipe');
+    }
   }
 }

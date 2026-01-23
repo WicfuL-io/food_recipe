@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';  // Tambahkan ini untuk File
 import '../models/recipe.dart';
 import '../services/api.dart';
 
@@ -50,9 +50,7 @@ class _EditRecipePageState extends State<EditRecipePage> {
       image,
     );
 
-    if (mounted) {
-      Navigator.pop(context);
-    }
+    if (mounted) Navigator.pop(context);
   }
 
   @override
@@ -77,11 +75,13 @@ class _EditRecipePageState extends State<EditRecipePage> {
           const SizedBox(height: 10),
 
           image != null
-              ? Image.file(File(image!.path), height: 160)  // Perbaiki: Preview gambar baru
-              : Image.network(  // Tampilkan gambar lama jika tidak ada gambar baru
-                  "http://localhost/food_recipe_api/upload/${widget.recipe.image}",
+              ? Image.network(image!.path, height: 160, fit: BoxFit.cover)
+              : Image.network(
+                  "${ApiService.baseUrl}/upload/${widget.recipe.image}",
                   height: 160,
-                  errorBuilder: (c, e, s) => const Icon(Icons.image_not_supported),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                      const Icon(Icons.image_not_supported),
                 ),
 
           const SizedBox(height: 20),

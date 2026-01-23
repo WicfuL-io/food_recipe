@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Food Recipe',
       theme: ThemeData(useMaterial3: true),
-      home: const SplashPage(),
+      home: SplashPage(),
     );
   }
 }

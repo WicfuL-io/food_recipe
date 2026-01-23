@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';  // Tambahkan ini untuk File
 import '../services/api.dart';
 
 class AddRecipePage extends StatefulWidget {
@@ -40,9 +40,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
       image!,
     );
 
-    if (mounted) {
-      Navigator.pop(context);
-    }
+    if (mounted) Navigator.pop(context);
   }
 
   @override
@@ -67,7 +65,11 @@ class _AddRecipePageState extends State<AddRecipePage> {
           if (image != null)
             Padding(
               padding: const EdgeInsets.only(top: 10),
-              child: Image.file(File(image!.path), height: 160),  // Perbaiki: Gunakan Image.file untuk preview lokal
+              child: Image.network(
+                image!.path, // Web & Mobile aman
+                height: 160,
+                fit: BoxFit.cover,
+              ),
             ),
 
           const SizedBox(height: 20),

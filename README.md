@@ -41,7 +41,7 @@ Pastikan tidak ada error ❌ penting.
 ## 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/USERNAME/FOOD_RECIPE.git
+git clone https://github.com/WicfuL-io/food_recipe.git
 cd FOOD_RECIPE/food_recipe_app
 ```
 

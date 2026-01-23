@@ -42,7 +42,7 @@ Pastikan tidak ada error ❌ penting.
 
 ```bash
 git clone https://github.com/WicfuL-io/food_recipe.git
-cd FOOD_RECIPE/food_recipe_app
+cd food_recipe_app
 ```
 
 ---

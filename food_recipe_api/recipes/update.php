@@ -1,28 +1,34 @@
 <?php
-
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
-header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json");
+
 include "../config/db.php";
 
-$id = $_POST['id'];
-$title = $_POST['title'];
+$id          = $_POST['id'];
+$title       = $_POST['title'];
 $description = $_POST['description'];
 $ingredients = $_POST['ingredients'];
-$steps = $_POST['steps'];
+$steps       = $_POST['steps'];
 
 if (!empty($_FILES['image']['name'])) {
-  $image = $_FILES['image']['name'];
-  move_uploaded_file($_FILES['image']['tmp_name'], "../upload/$image");
-  $conn->query("UPDATE recipes SET image='$image' WHERE id=$id");
+    $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+    $image = time() . "." . $ext;
+    move_uploaded_file($_FILES['image']['tmp_name'], "../upload/$image");
+
+    $stmt = $conn->prepare(
+        "UPDATE recipes 
+         SET title=?, description=?, ingredients=?, steps=?, image=?
+         WHERE id=?"
+    );
+    $stmt->bind_param("sssssi", $title, $description, $ingredients, $steps, $image, $id);
+} else {
+    $stmt = $conn->prepare(
+        "UPDATE recipes 
+         SET title=?, description=?, ingredients=?, steps=?
+         WHERE id=?"
+    );
+    $stmt->bind_param("ssssi", $title, $description, $ingredients, $steps, $id);
 }
 
-$conn->query("UPDATE recipes SET
-title='$title',
-description='$description',
-ingredients='$ingredients',
-steps='$steps'
-WHERE id=$id");
-
+$stmt->execute();
 echo json_encode(["status" => "success"]);
-?>

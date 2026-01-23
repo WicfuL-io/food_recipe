@@ -26,6 +26,51 @@ class _HomePageState extends State<HomePage> {
     loadData();
   }
 
+  // ================= POPUP DELETE =================
+  Future<void> showDeletePopup(BuildContext context, Recipe recipe) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text("Konfirmasi Hapus"),
+          content: Text(
+            "Apakah kamu yakin ingin menghapus resep:\n\n${recipe.title} ?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("Batal"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text("Hapus"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      await ApiService.deleteRecipe(recipe.id);
+      setState(() => loadData());
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Resep berhasil dihapus 🗑"),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+  // ================================================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,7 +125,8 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(18),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color.fromARGB(255, 234, 128, 14).withOpacity(0.08),
+                        color: const Color.fromARGB(255, 234, 128, 14)
+                            .withOpacity(0.08),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -94,7 +140,10 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(18),
                         ),
-                        child: WebImage("http://127.0.0.1/food_recipe_api/upload/${r.image}",height: 180,)   
+                        child: WebImage(
+                          "http://127.0.0.1/food_recipe_api/upload/${r.image}",
+                          height: 180,
+                        ),
                       ),
 
                       Padding(
@@ -114,8 +163,8 @@ class _HomePageState extends State<HomePage> {
                               r.description,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: const Color.fromARGB(255, 2, 2, 2),
+                              style: const TextStyle(
+                                color: Color.fromARGB(255, 2, 2, 2),
                               ),
                             ),
                             const SizedBox(height: 12),
@@ -124,22 +173,24 @@ class _HomePageState extends State<HomePage> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.orange),
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.orange),
                                   onPressed: () async {
                                     await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) => EditRecipePage(recipe: r),
+                                        builder: (_) =>
+                                            EditRecipePage(recipe: r),
                                       ),
                                     );
                                     setState(() => loadData());
                                   },
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () async {
-                                    await ApiService.deleteRecipe(r.id);
-                                    setState(() => loadData());
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.red),
+                                  onPressed: () {
+                                    showDeletePopup(context, r);
                                   },
                                 ),
                               ],
